@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
@@ -47,12 +48,19 @@ class ProjectController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProjectRequest $request)
-    {
+    public function store(StoreProjectRequest $request){
         $data = $request->validated();
         $userId = Auth::user()->id;
+
+        /** @var \Illuminate\Http\UploadedFile $image */
+        $image = $data['image'];
+
         $data['created_by'] = $userId;
         $data['updated_by'] = $userId;
+
+        if($image) {
+            $data['image_path'] = $image->store('projects/'. Str::random(10), 'public');
+        }
         Project::create($data);
 
         return to_route('project.index')->with('success', 'Project was created');
