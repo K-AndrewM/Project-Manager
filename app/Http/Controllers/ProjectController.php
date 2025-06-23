@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProjectController extends Controller
@@ -93,17 +94,32 @@ class ProjectController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Project $project)
-    {
-        //
+    public function edit(Project $project){
+        return inertia('Project/Edit', [
+            'project' => new ProjectResource($project),
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProjectRequest $request, Project $project)
-    {
-        //
+    public function update(UpdateProjectRequest $request, Project $project){
+        $data = $request->validated();
+
+        /** @var \Illuminate\Http\UploadedFile $image */
+        $image = $data['image'];
+
+        $data['updated_by'] = Auth::user()->id;
+
+        if($image) {
+            if($project->image_path) {
+                Storage::disk('public')->deleteDirectory(dirname($project->image_path));
+            }
+            $data['image_path'] = $image->store('projects/'. Str::random(10), 'public');
+        }
+        $project->update($data);
+
+        return to_route('project.index')->with('success', "Project {$project->name} was updated");
     }
 
     /**
