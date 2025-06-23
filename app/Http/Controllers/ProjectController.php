@@ -109,8 +109,14 @@ class ProjectController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Project $project)
-    {
-        //
+    public function destroy(Project $project){
+        $projectName = $project->name;
+        $project->tasks()->delete();
+        $project->delete();
+        if($project->image_path) {
+            Storage::disk('public')->deleteDirectory(dirname($project->image_path));
+        }
+
+        return to_route('project.index')->with('success', "Project {$projectName} was deleted");
     }
 }
