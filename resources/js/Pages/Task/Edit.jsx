@@ -5,20 +5,25 @@ import TextAreaInput from "@/Components/TextAreaInput";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import SelectInput from "@/Components/SelectInput";
-import { use } from "react";
 
-export default function Create({ auth, projects, users }) {
-   const { data, setData, post, errors, reset } = useForm({
+export default function Edit({ auth, task, projects, users }) {
+   console.log(task);
+   const { data, setData, post, errors } = useForm({
       image: "",
-      name: "",
-      description: "",
-      due_date: "",
+      name: task.name || "",
+      description: task.description || "",
+      due_date: task.due_date || "",
+      project_id: task.project.id || "",
+      assigned_user_id: task.assignedUser.id || "",
+      status: task.status || "",
+      priority: task.priority || "",
+      _method: "PUT",
    });
 
    const onSubmit = (e) => {
       e.preventDefault();
 
-      post(route("task.store"));
+      post(route("task.update", task));
    };
 
    return (
@@ -27,12 +32,12 @@ export default function Create({ auth, projects, users }) {
          header={
             <div className="flex justify-between items-center">
                <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                  Tasks
+                  Edit Task "{task.name}"
                </h2>
             </div>
          }
       >
-         <Head title="Tasks" />
+         <Head title="Edit Task" />
 
          <div className="py-12">
             <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -42,15 +47,21 @@ export default function Create({ auth, projects, users }) {
                      onSubmit={onSubmit}
                      className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg"
                   >
-                     <div>
-                        <InputLabel
-                           htmlFor="task_project"
-                           value="Assigned User"
-                        />
+                     {task.image_path && (
+                        <div className="mb-4">
+                           <img
+                              src={task.image_path}
+                              alt="Task image"
+                              className="w-1/2 mx-auto"
+                           />
+                        </div>
+                     )}
+                     <div className="mt-4">
+                        <InputLabel htmlFor="task_project_id" value="Project" />
                         <SelectInput
-                           id="task_project"
-                           name="project"
-                           value={data.project}
+                           id="task_project_id"
+                           name="project_id"
+                           value={data.project_id}
                            onChange={(e) =>
                               setData("project_id", e.target.value)
                            }
@@ -63,9 +74,12 @@ export default function Create({ auth, projects, users }) {
                               </option>
                            ))}
                         </SelectInput>
-                        <InputError message={errors.project} className="mt-2" />
+                        <InputError
+                           message={errors.project_id}
+                           className="mt-2"
+                        />
                      </div>
-                     <div className="mt-4">
+                     <div>
                         <InputLabel
                            htmlFor="task_image_path"
                            value="Task Image"
@@ -157,7 +171,7 @@ export default function Create({ auth, projects, users }) {
                            onChange={(e) => setData("priority", e.target.value)}
                            className="mt-1 block w-full"
                         >
-                           <option value="">Select priority</option>
+                           <option value="">Select Priority</option>
                            <option value="low">Low</option>
                            <option value="medium">Medium</option>
                            <option value="high">High</option>
@@ -169,29 +183,25 @@ export default function Create({ auth, projects, users }) {
                      </div>
                      <div className="mt-4">
                         <InputLabel
-                           htmlFor="task_assigned_user"
+                           htmlFor="task_assigned_user_id"
                            value="Assigned User"
                         />
                         <SelectInput
-                           id="task_assigned_user"
-                           name="assigned_user"
-                           value={data.assigned_user}
+                           id="task_assigned_user_id"
+                           name="assigned_user_id"
+                           value={data.assigned_user_id}
                            onChange={(e) =>
                               setData("assigned_user_id", e.target.value)
                            }
                            className="mt-1 block w-full"
                         >
-                           <option value="">Select User</option>
                            {users.data.map((user) => (
                               <option value={user.id} key={user.id}>
                                  {user.name}
                               </option>
                            ))}
                         </SelectInput>
-                        <InputError
-                           message={errors.assigned_user}
-                           className="mt-2"
-                        />
+                        <InputError message={errors.status} className="mt-2" />
                      </div>
                      <div className="mt-4 text-right">
                         <Link href={route("task.index")}>

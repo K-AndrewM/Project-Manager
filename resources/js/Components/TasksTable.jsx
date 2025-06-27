@@ -10,6 +10,7 @@ export default function TasksTable({
    tasks,
    hideProjectColumn = false,
 }) {
+   console.table(tasks.data);
    queryParams = queryParams || {};
    // Search and status filters
    const searchFieldChanged = (name, value) => {
@@ -42,6 +43,14 @@ export default function TasksTable({
       }
 
       router.get(route("task.index"), queryParams);
+   };
+
+   const deleteTask = (task) => {
+      if (!window.confirm("Are you sure?")) {
+         return;
+      } else {
+         router.get(route("task.delete", task.id));
+      }
    };
    return (
       <div className="p-6 text-gray-900 dark:text-gray-100">
@@ -169,18 +178,23 @@ export default function TasksTable({
                         </td>
                         <td className="px-3 py-2">{task.createdBy.name}</td>
                         <td className="px-3 py-2">
-                           <Link
-                              href={route("task.edit", task.id)}
-                              className="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-1"
-                           >
-                              Edit
-                           </Link>
-                           <Link
-                              href={route("task.destroy", task.id)}
-                              className="font-medium text-red-600 dark:text-red-500 hover:underline mx-1"
-                           >
-                              Delete
-                           </Link>
+                           <div className="flex items-center gap-x-2">
+                              <Link
+                                 href={route("task.edit", task.id)}
+                                 className="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-1"
+                              >
+                                 Edit
+                              </Link>
+                              <button
+                                 type="button"
+                                 onClick={() => {
+                                    deleteTask(task);
+                                 }}
+                                 className="font-medium text-red-600 dark:text-red-500 hover:underline mx-1"
+                              >
+                                 Delete
+                              </button>
+                           </div>
                         </td>
                      </tr>
                   ))
