@@ -25,6 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function() {
     Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->name('dashboard');
 
     Route::resource('project', ProjectController::class);
+    Route::get('task/destroy/{task}', [TaskController::class, 'destroy'])->name('task.delete');
     Route::resource('task', TaskController::class);
     Route::resource('user', UserController::class);
 });
