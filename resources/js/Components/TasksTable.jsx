@@ -10,7 +10,6 @@ export default function TasksTable({
    tasks,
    hideProjectColumn = false,
 }) {
-   console.table(tasks.data);
    queryParams = queryParams || {};
    // Search and status filters
    const searchFieldChanged = (name, value) => {
