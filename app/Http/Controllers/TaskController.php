@@ -133,4 +133,20 @@ class TaskController extends Controller
 
         return to_route('task.index')->with('success', "Task {$taskName} was deleted");
     }
+
+    /**
+     * Show all tasks of a user
+     */
+    public function myTasks(User $user) {
+        $query = Task::query();
+
+        $sortField = request('sort_field', 'created_at');
+        $sortDirection = request('sort_direction', 'desc');
+        $tasks = $query->where('assigned_user_id', Auth::user()->id)->orderBy($sortField,$sortDirection)->paginate(10);
+        // dd(TaskResource::collection($tasks));
+        return inertia('Task/MyTasks', [
+            'tasks' => TaskResource::collection($tasks),
+            'queryParams' => request()->query() ?: ['sort_field' => 'created_at', 'sort_direction' => 'desc'],
+        ]);
+    }
 }
